@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Wallet;
 use Melihovv\Base64ImageDecoder\Base64ImageDecoder;
-use Tymon\JWTAuth\Facades\JwtAuth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JwtExceptions;
 
 class AuthController extends Controller
@@ -66,7 +66,7 @@ class AuthController extends Controller
 
             DB::commit();
 
-            $token = JwtAuth::attempt(['email' => $request->email, 'password' => $request->password]);
+            $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
             //the getUser function can accessed because we defined in composer.json in autoload and registered with comman
             $userResponse = getUser($request->email);
             $userResponse->token = $token;
@@ -96,7 +96,7 @@ class AuthController extends Controller
         }
 
         try {
-            $token = JwtAuth::attempt($credentials);
+            $token = JWTAuth::attempt($credentials);
 
             if(!$token){
                 return response()->json(['message' => 'Login Credentials are invalid'], 400);
