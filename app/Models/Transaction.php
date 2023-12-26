@@ -17,7 +17,7 @@ class Transaction extends Model
         'payment_method_id',
         'product_id',
         'amount',
-        'desctription',
+        'description',
         'status',
         'transaction_code',
     ];
