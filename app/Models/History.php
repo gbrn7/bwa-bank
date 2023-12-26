@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TransferHistory extends Model
+class History extends Model
 {
     use HasFactory;
 
-    protected $table = 'transfer_histories';
+    protected $table = 'histories';
 
     protected $fillable = [
         'sender_id',

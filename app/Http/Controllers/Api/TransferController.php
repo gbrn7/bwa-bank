@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
-use App\Models\TransactionHistory;
+use App\Models\History;
 use App\Models\TransactionType;
 use App\Models\Wallet;
 use App\Models\User;
@@ -55,6 +55,55 @@ class TransferController extends Controller
         // dd($sender, $receiver);
         if($senderWallet->balance < $request->amount){
             return response()->json(['message' => 'Your Balance Is Not Enough'], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $transactionType = TransactionType::whereIn('code', ['receive', 'transfer'])
+                                                ->orderBy('code', 'asc')
+                                                ->get();
+            $receiveTransactionType = $transactionType->first();
+            $transferTransactionType = $transactionType->last();
+            $paymentMethod = PaymentMethod::where('code', 'bwa')->first();
+            $transactionCode = strtoupper(Str::random(10));
+            // Transaction for transfer
+            $transferTransaction = Transaction::create([
+                'user_id' => $sender->id,
+                'transaction_type_id' => $transferTransactionType->id,
+                'description' => 'Transfer fund to'.$receiver->username,
+                'amount' => $request->amount,
+                'transaction_code' => $transactionCode,
+                'status' => 'success',
+                'payment_method_id' => $paymentMethod->id
+            ]);
+
+            $senderWallet->decrement('balance', $request->amount);
+            // dd('cek');
+            // Transaction for receive
+            $transferTransaction = Transaction::create([
+                'user_id' => $receiver->id,
+                'transaction_type_id' => $receiveTransactionType->id,
+                'description' => 'Receive fund from'.$sender->username,
+                'amount' => $request->amount,
+                'transaction_code' => $transactionCode,
+                'status' => 'success',
+                'payment_method_id' => $paymentMethod->id
+            ]);
+            Wallet::where('user_id', $receiver->id)->increment('balance', $request->amount);
+
+            History::create([
+                'sender_id' => $sender->id,
+                'receiver_id' => $receiver->id,
+                'transaction_code' => $transactionCode,
+            ]);
+
+            DB::commit();
+            
+            return response()->json(['message' => 'Transfer Success']);
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollback();
+            return response()->json(['message' => $th->getMessage()], 500);
         }
     }
 }
