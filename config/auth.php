@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -36,8 +36,16 @@ return [
     */
 
     'guards' => [
+        // if http req from web.php this code will handle
         'web' => [
             'driver' => 'session',
+            // provide is whete system check authentication ini this case in admin_users model in line 70 block
+            'provider' => 'admin_users',
+        ],
+        // if http req from api.php this code will handle
+        'api' => [
+            'driver' => 'jwt',
+            // provide is whete system check authentication ini this case in users model in line 70 block
             'provider' => 'users',
         ],
     ],
@@ -64,11 +72,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admin_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AdminUser::class,
+        ],
     ],
 
     /*
