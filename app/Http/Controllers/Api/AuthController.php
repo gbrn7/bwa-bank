@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Wallet;
 use Melihovv\Base64ImageDecoder\Base64ImageDecoder;
@@ -32,8 +33,9 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email already taken'], 404);
         }
 
+        DB::beginTransaction();
         try {
-            $profilPicture = null;
+            $profilePicture = null;
             $ktp = null;
 
             if($request->profile_picture){
@@ -42,10 +44,48 @@ class AuthController extends Controller
             if($request->ktp){
                 $ktp = $this->uploadBase64Image($request->ktp);
             }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'username' => $request->email,
+                'password' => bcrypt($request->password),
+                'profile_picture' => $profilePicture,
+                'ktp' => $ktp,
+                'verified' => ($ktp) ? true : false,
+            ]);
+
+            Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+                'pin' => $request->pin,
+                'card_number' => $this->generateCardNumber(16),
+            ]);
+
+            DB::commit();
+            return response()->json($user, 201);
+
         } catch (\Throwable $th) {
             //throw $th;
-            echo $th;
+            // echo $th;
+            DB::rollback();
+            return response()->json(['message' => $th->getMessage()], 500);
         }
+    }
+
+    private function generateCardNumber($length){
+        $result = '';
+        for ($i=0; $i < $length; $i++) { 
+            $result .= mt_rand(0, 9);
+        }
+
+        $wallet = Wallet::where('card_number', $result)->exists();
+
+        if($wallet){
+            return $this->generateCardNumber($length);
+        }
+
+        return $result;
     }
 
     private function uploadBase64Image($base64Image){
