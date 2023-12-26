@@ -94,7 +94,13 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Login Credentials are invalid'], 400);
             }
 
-            return response()->json(['token' => $token], 200);        
+            //the getUser function can accessed because we defined in composer.json in autoload and registered with comman
+            $userResponse = getUser($request->email);
+            $userResponse->token = $token;
+            $userResponse->token_expires_in = auth()->factory()->getTTl() * 60;
+            $userResponse->token_type = 'bearer';
+
+            return response()->json($userResponse, 200);        
         } catch (\JwtExceptions $th) {
             //throw $th;
             return response()->json(['message' => $th->getMessage()], 500);        
