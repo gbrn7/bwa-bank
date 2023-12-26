@@ -65,7 +65,15 @@ class AuthController extends Controller
             ]);
 
             DB::commit();
-            return response()->json($user, 201);
+
+            $token = JwtAuth::attempt(['email' => $request->email, 'password' => $request->password]);
+            //the getUser function can accessed because we defined in composer.json in autoload and registered with comman
+            $userResponse = getUser($request->email);
+            $userResponse->token = $token;
+            $userResponse->token_expires_in = auth()->factory()->getTTl() * 60;
+            $userResponse->token_type = 'bearer';
+
+            return response()->json($userResponse, 201);
 
         } catch (\Throwable $th) {
             //throw $th;
