@@ -21,7 +21,7 @@ Route::get('payment_finish', [RedirectPaymentController::class, 'finish']);
 Route::group(['prefix' => 'admin'], function(){
   Route::view('login', 'login')->name('admin.auth.index');
   Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
-
+  Route::get('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
   Route::middleware(['auth:web'])->group(function () {
     Route::view('/', 'dashboard')->name('admin.dashboard');

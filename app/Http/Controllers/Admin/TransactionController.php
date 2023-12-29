@@ -22,4 +22,6 @@ class TransactionController extends Controller
         
         return view('transactions', ['transactions' => $transactions]);
     }
+
+
 }
