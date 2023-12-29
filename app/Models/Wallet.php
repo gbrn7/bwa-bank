@@ -17,4 +17,9 @@ class Wallet extends Model
         'user_id',
         'card_number',
     ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 }

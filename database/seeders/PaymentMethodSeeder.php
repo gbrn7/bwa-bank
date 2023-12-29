@@ -18,6 +18,7 @@ class PaymentMethodSeeder extends Seeder
                 'name' => 'Bank BWA',
                 'code' => 'bwa',
                 'status' => 'active',
+                'thumbnail' => 'bwa.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
