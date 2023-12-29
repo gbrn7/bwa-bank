@@ -12,7 +12,7 @@ use App\Models\Wallet;
   $user->ktp = $user->ktp ? url ('storage/'.$user->ktp) : '';
   $user->balance = $wallet->balance;
   $user->card_number = $wallet->card_number;
-  $user->pin = $wallet->pin;
+  // $user->pin = $wallet->pin;
 
   return $user;
 }
