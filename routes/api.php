@@ -44,4 +44,5 @@ Route::middleware(['middleware' => 'jwt.verify'])->group(function ($router) {
     Route::get('users/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('users', [UserController::class, 'update']);
     Route::get('wallet', [WalletController::class, 'show']);
+    Route::put('wallet', [WalletController::class, 'update']);
 });
