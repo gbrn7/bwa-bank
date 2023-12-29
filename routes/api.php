@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('is-email-exists', [UserController::class, 'isEmailExists']);
 
 Route::post('webhooks', [WebhookController::class, 'update']);
 
